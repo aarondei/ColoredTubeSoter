@@ -67,6 +67,6 @@
          </children>
       </GridPane>
       <Button layoutX="493.0" layoutY="384.0" mnemonicParsing="false" onAction="#onResetClick" text="X" />
-      <Button layoutX="279.0" layoutY="384.0" mnemonicParsing="false" onAction="#onSaveClick" text="S" />
+      <Button layoutX="279.0" layoutY="384.0" mnemonicParsing="false" onAction="#onSimulateClick" text="S" />
    </children>
 </AnchorPane>

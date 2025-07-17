@@ -9,12 +9,17 @@ public class ShellController extends BaseController {
     private TextArea taShellArea;
 
     private String data;
+    private String[] raw;
 
     public void setData(Object data) {
         this.data = (String) data;
     }
 
     public void postInit() {
-        taShellArea.setText(data);
+        raw = data.split("\n");
+    }
+
+    public void track(int i) {
+        taShellArea.setText(taShellArea.getText() + raw[i] + "\n");
     }
 }

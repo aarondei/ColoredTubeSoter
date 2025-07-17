@@ -2,21 +2,21 @@ package com.example.coloredtubesorter.Logic.Sort;
 
 import com.example.coloredtubesorter.Elements.ColorEnum;
 import com.example.coloredtubesorter.Elements.Tube;
+import com.example.coloredtubesorter.Logic.Pourable;
 import javafx.scene.shape.Rectangle;
 
 import java.util.*;
 
-public class Sorter {
+public class Sorter implements Pourable {
 
     private static Sorter instance;
 
     Queue<State> states = new LinkedList<>();
     private final List<Tube> tubeList;
-    private final Set<String> visitedStates = new HashSet<>();
+    private Set<String> visitedStates = new HashSet<>();
 
-    private final StringBuilder log = new StringBuilder();
+    private StringBuilder log = new StringBuilder();
     private List<Tube> finalConfig;
-
 
     private Sorter(List<Tube> tubeList) {
         this.tubeList = tubeList;
@@ -28,7 +28,15 @@ public class Sorter {
         }
         return instance;
     }
-
+    public void reset() {
+        states.clear();
+        states = new LinkedList<>();
+        visitedStates.clear();
+        visitedStates = new HashSet<>();
+        log.setLength(0);
+        log = new StringBuilder();
+        finalConfig = null;
+    }
 
     public boolean pathFind() {
 
@@ -119,14 +127,6 @@ public class Sorter {
         return true;
     }
 
-    private void pour(Tube from, Tube to) {
-
-        // quantifies 2 same-colored layers as 1 move
-        while (canPour(from, to)) {
-            Rectangle r = from.pourLiquid();
-            to.fillLiquid(r);
-        }
-    }
     private Tube getTubeCopy(int name, List<Tube> tubes) {
         for (Tube t : tubes) {
             if (t.getName() == name) return t;
@@ -135,18 +135,7 @@ public class Sorter {
         throw new RuntimeException("Tube copy reference is null.");
     }
 
-    private boolean canPour(Tube from, Tube to) {
 
-        // can pour = tops match color, from not empty, to not full, can pour if to empty
-        if (from.isEmpty() || to.isFull()) return false;
-
-        if (to.isEmpty()) return true;
-
-        ColorEnum topFrom = getRectColor(from.getStackTube().top());
-        ColorEnum topTo = getRectColor(to.getStackTube().top());
-
-        return topFrom == topTo;
-    }
     private boolean hasBetterMatchingTube(Tube from, State s) {
 
         // pruning that looks in the current tube list in advance to scout for same color, non-empty to tubes
@@ -224,9 +213,7 @@ public class Sorter {
 //        return String.join("|", tubeStrings);
     }
 
-    private ColorEnum getRectColor(Rectangle r) {
-        return (ColorEnum) r.getUserData();
-    }
+
 
 
     private void transcribeHistory(List<Move> moveList) {

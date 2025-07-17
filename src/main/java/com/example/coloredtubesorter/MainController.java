@@ -2,6 +2,7 @@ package com.example.coloredtubesorter;
 
 import com.example.coloredtubesorter.Elements.ColorEnum;
 import com.example.coloredtubesorter.Elements.Tube;
+import com.example.coloredtubesorter.Logic.Simulation.Simulator;
 import com.example.coloredtubesorter.Logic.Sort.Sorter;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,6 +34,7 @@ public class MainController extends BaseController {
     private int currentTubeIndex = 0;
 
     private boolean isLocked = false;
+    private String moveHistory = "";
 
     @Override
     public void setData(Object data) {
@@ -216,6 +218,7 @@ public class MainController extends BaseController {
         // PATHFINDING BEGINS HERE
         Sorter sorter = Sorter.getInstance(tubeList);
 
+        // path-find
         long start = System.currentTimeMillis();
         boolean solved = sorter.pathFind();
         long end = System.currentTimeMillis();
@@ -235,30 +238,23 @@ public class MainController extends BaseController {
                     -fx-background-color: #80ef80;
                     """);
 
-            // reconstruct winning state
-            apMainPane.getChildren().clear();
-            Map<String, Double> layoutSetting = new HashMap<>();
-            configTubeLayout(layoutSetting);
-
-            for (Tube t : sorter.extractState()) {
-                setTubeDesign(t);
-                setTubeLayout(t, layoutSetting);
-                setTubeLabel(t);
-                apMainPane.getChildren().add(t.getContainer());
-            }
-
             // reconstruct winning move history
-            MainApplication.openShell(sorter.extractHistory());
+//            simulate(sorter.extractHistory());
+            moveHistory = sorter.extractHistory();
 
         } else {
             tfStatus.setStyle("""
                     -fx-background-color: #e54c38;
                     """);
         }
+
+        // free memory
+        sorter.reset();
     }
 
     public void onResetClick(ActionEvent actionEvent) {
 
+        apMainPane.getChildren().clear();
         tfStatus.clear();
         tfStatus.setFocusTraversable(false);
         tfStatus.setMouseTransparent(true);
@@ -269,17 +265,27 @@ public class MainController extends BaseController {
         for (Tube t : tubeList) {
             t.resetTube();
             highlightTube(t, false);
+            apMainPane.getChildren().add(t.getContainer());
         }
 
         highlightTube(tubeList.getFirst(), true);
     }
 
-    public void onSaveClick(ActionEvent actionEvent) {
+    public void onSimulateClick(ActionEvent actionEvent) {
 
+        if (!isLocked) return;
 
-
-
+        if (moveHistory.isEmpty()) throw new RuntimeException("Move history is missing.");
+        simulate(moveHistory);
     }
 
+    private void simulate(String moves) {
 
+        // open shell windows
+        BaseController shell = MainApplication.openLog(moves);
+
+        // run simulator
+        Simulator simulator = Simulator.getInstance(tubeList, moves);
+        simulator.simulate(apMainPane, (ShellController) shell);
+    }
 }

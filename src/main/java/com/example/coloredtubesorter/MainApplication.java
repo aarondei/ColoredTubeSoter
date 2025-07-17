@@ -49,7 +49,7 @@ public class MainApplication extends Application {
 
     }
 
-    public static void openShell(String data) {
+    public static BaseController openLog(Object data) {
 
         try {
             Stage shell = new Stage();
@@ -61,7 +61,11 @@ public class MainApplication extends Application {
             controller.postInit();
 
             shell.setScene(new Scene(root));
+            shell.setX(primaryStage.getWidth());
+            shell.setY(primaryStage.getY());
             shell.show();
+
+            return controller;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
