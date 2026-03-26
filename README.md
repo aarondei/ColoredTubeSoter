@@ -1,6 +1,6 @@
 # Tube Sorter Engine
 
-A puzzle engine that sorts layers of liquid inside tubes.  
+A program designed to automatically solve and simulate tube sorting puzzles.
 Implements **Breadth-First Search (BFS)** to compute optimal moves.  
 
 **Features:**
